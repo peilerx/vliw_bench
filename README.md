@@ -13,10 +13,11 @@ This dataset size is ~53x larger than the CPU's L3 cache (3 MB), forcing the sys
 
 ## Final Results (40,000,000 elements)
 
-| Method | Execution Time | Throughput | Gap |
+| Method | Execution Time | Throughput | Strategy |
 | :--- | :--- | :--- | :--- |
-| **Native** | 47.17 ms | ~3.39 GB/s | Baseline |
-| **VLIW-style** | 12.58 ms | **~12.72 GB/s** | **3.75x Faster** |
+| **Native (`.sum()`)** | 47.36 ms | ~3.37 GB/s | Sequential Dependency (1 ALU) |
+| **VLIW-style (Manual)** | 12.55 ms | **~12.74 GB/s** | ILP via 4 Accumulators (4 ALUs) |
+| **VLIW-style (Idiomatic)**| 12.90 ms | **~12.40 GB/s** | `chunks_exact` + Array Fold |
 
 ## ASM Code
 ```asm

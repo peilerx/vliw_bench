@@ -1,4 +1,4 @@
-# Data Preparation for CPU Experiment
+# Data Preparation for CPU
 
 ## Final Results of sum for [f32] (40,000,000 elements)
 

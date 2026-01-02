@@ -1,4 +1,4 @@
-# Handled Data Preparation for CPU vs Native Data Preparation
+# Handled Data Preparation vs Native Data Preparation (for CPU)
 
 ## Final Results of sum for [f32] (40,000,000 elements)
 

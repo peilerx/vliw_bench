@@ -1,4 +1,4 @@
-# Data Preparation for CPU Experiment (Rust)
+# Data Preparation for CPU Experiment
 
 ## Final Results of sum for [f32] (40,000,000 element)
 

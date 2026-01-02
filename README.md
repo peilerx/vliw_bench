@@ -1,31 +1,31 @@
 # VLIW-style Summation Experiment (Rust)
 
-A deep dive into Instruction Level Parallelism (ILP) mechanisms and SIMD vectorization efficiency when facing the "Memory Wall."
+A study on Instruction Level Parallelism (ILP) and Memory Wall constraints.
 
-## Experiment Overview
-This benchmark compares two different approaches to summing an array of 1,000,000 `f32` elements (approx. 4 MB):
-1. **Native**: Utilizing standard Rust iterators. Due to strict data dependencies, the CPU is forced to execute additions sequentially (Scalar Addition).
-2. **VLIW-style**: Manually unrolling the loop into 4 independent accumulators. This "hints" the compiler to use SIMD instructions (`vaddps`) and saturate multiple execution ports simultaneously.
+## The Experiment
+Testing the summation of **40,000,000** `f32` elements (~160 MB). 
+This dataset size is ~53x larger than the CPU's L3 cache (3 MB), forcing the system to rely entirely on DRAM performance and the Hardware Prefetcher.
 
 ## Hardware Specifications
 - **CPU**: Intel Core i5-7200U (Skylake-U) @ 2.50GHz
-- **Architecture**: x86_64 (AVX2, FMA support)
-- **L3 Cache**: 3 MB (The 4 MB test set intentionally exceeds L3 to trigger RAM access)
-- **OS**: Linux
-- **Compiler**: rustc 1.92.0
+- **L3 Cache**: 3 MB
+- **Data Size**: 160 MB (40M elements * 4 bytes)
 
-## Performance Results (1,000,000 elements)
+## Final Results (40,000,000 elements)
 
-| Method | Mean Time | Throughput (approx) |
-| :--- | :--- | :--- |
-| **Native** | 11.857 ms | ~337 MB/s |
-| **VLIW-style (4x Acc)** | 3.447 ms | ~1.16 GB/s |
+| Method | Execution Time | Throughput | Gap |
+| :--- | :--- | :--- | :--- |
+| **Native** | 47.17 ms | ~3.39 GB/s | Baseline |
+| **VLIW-style** | 12.58 ms | **~12.72 GB/s** | **3.75x Faster** |
 
-**Analysis**: We achieved a **3.44x speedup**. Despite spilling into RAM, the parallelized data access pattern allows the Hardware Prefetcher to utilize memory bandwidth more effectively compared to the scalar approach.
+### Critical Insight: We broke the 10 GB/s barrier!
+With 40M elements, the throughput calculation ($160MB / 0.01258s$) shows we reached **~12.7 GB/s**. 
 
-## How to Run
+This is an incredible result for a single core on a Skylake-U. It means:
+1. **Saturation**: We are likely hitting the absolute maximum bandwidth that a single core can request from the memory controller.
+2. **Prefetcher Efficiency**: The CPU successfully predicted the linear access pattern, keeping the SIMD units fed even though the data was far out in RAM.
+3. **VLIW Victory**: The native code stayed at ~3.4 GB/s because it couldn't request data fast enough due to serial dependencies.
 
-To reproduce these results with maximum hardware-specific optimizations, use the following flags:
-
+## Run Benchmarks
 ```bash
 RUSTFLAGS="-C opt-level=3 -C target-cpu=native" cargo bench

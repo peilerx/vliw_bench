@@ -1,6 +1,6 @@
 # Data Preparation for CPU Experiment
 
-## Final Results of sum for [f32] (40,000,000 element)
+## Final Results of sum for [f32] (40,000,000 elements)
 
 | Method | Execution Time | Throughput | Strategy |
 | :--- | :--- | :--- | :--- |

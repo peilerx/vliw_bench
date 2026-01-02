@@ -1,0 +1,43 @@
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
+
+pub fn native_sum(data: &[f32]) -> f32 {
+    data.iter().fold(0.0, |acc, &x| acc + x)
+}
+
+pub fn vliw_style_sum(data: &[f32]) -> f32 {
+    let mut acc0 = 0.0;
+    let mut acc1 = 0.0;
+    let mut acc2 = 0.0;
+    let mut acc3 = 0.0;
+    let chunks = data.chunks_exact(4);
+    let remainder = chunks.remainder();
+    for chunk in chunks {
+        acc0 += chunk[0];
+        acc1 += chunk[1];
+        acc2 += chunk[2];
+        acc3 += chunk[3];
+    }
+    let mut sum = acc0 + acc1 + acc2 + acc3;
+    for &x in remainder {
+        sum += x;
+    }
+    sum
+}
+
+fn criterion_benchmark(c: &mut Criterion) {
+    let size = 100_000_00;
+    let data = vec![1.1f32; size];
+
+    let mut group = c.benchmark_group("Summing");
+
+    group.bench_function("Native", |b| b.iter(|| native_sum(black_box(&data))));
+
+    group.bench_function("VLIW-style", |b| {
+        b.iter(|| vliw_style_sum(black_box(&data)))
+    });
+
+    group.finish();
+}
+
+criterion_group!(benches, criterion_benchmark);
+criterion_main!(benches);

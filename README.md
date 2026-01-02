@@ -18,6 +18,7 @@ This dataset size is ~53x larger than the CPU's L3 cache (3 MB), forcing the sys
 | **Native** | 47.17 ms | ~3.39 GB/s | Baseline |
 | **VLIW-style** | 12.58 ms | **~12.72 GB/s** | **3.75x Faster** |
 
+## ASM Code
 ```asm
 native_sum:
         test    rsi, rsi
